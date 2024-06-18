@@ -34,31 +34,31 @@ variable "kubernetes_version" {
 variable "cluster_name" {
   description = "A name to provide for the Talos cluster"
   type        = string
-  default     = "example"
+  default     = "k8s-talos-cluster"
 }
 
 variable "cluster_vip" {
   description = "A name to provide for the Talos cluster"
   type        = string
-  default     = "192.168.1.79"
+  default     = "192.168.18.79"
 }
 
 variable "cluster_endpoint" {
   description = "The k8s api-server (VIP) endpoint"
   type        = string
-  default     = "https://192.168.1.79:6443" # k8s api-server endpoint.
+  default     = "https://192.168.18.79:6443" # k8s api-server endpoint.
 }
 
 variable "cluster_node_network_gateway" {
   description = "The IP network gateway of the cluster nodes"
   type        = string
-  default     = "192.168.1.254"
+  default     = "192.168.18.1"
 }
 
 variable "cluster_node_network" {
   description = "The IP network prefix of the cluster nodes"
   type        = string
-  default     = "192.168.1.0/24"
+  default     = "192.168.18.0/24"
 }
 
 variable "cluster_node_network_first_controller_hostnum" {
@@ -96,7 +96,7 @@ variable "controller_count" {
 
 variable "worker_count" {
   type    = number
-  default = 1
+  default = 2
   validation {
     condition     = var.worker_count >= 1
     error_message = "Must be 1 or more."
@@ -105,5 +105,5 @@ variable "worker_count" {
 
 variable "prefix" {
   type    = string
-  default = "talos-example"
+  default = "talos-cluster"
 }

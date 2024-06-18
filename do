@@ -42,6 +42,7 @@ function build_talos_image {
   # see https://www.talos.dev/v1.7/talos-guides/install/boot-assets/
   # see https://www.talos.dev/v1.7/advanced/metal-network-configuration/
   # see Profile type at https://github.com/siderolabs/talos/blob/v1.7.4/pkg/imager/profile/profile.go#L22-L45
+  #https://github.com/siderolabs/image-factory
   local talos_version_tag="v$talos_version"
   rm -rf tmp/talos
   mkdir -p tmp/talos
@@ -258,8 +259,10 @@ case $1 in
     apply
     ;;
   plan-apply)
+    source secrets-proxmox.sh
     plan
     apply
+    source cluster-kubeconfig.sh
     ;;
   health)
     health

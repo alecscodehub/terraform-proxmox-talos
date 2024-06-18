@@ -57,7 +57,16 @@ talos_version='1.7.4'
 wget https://github.com/siderolabs/talos/releases/download/v$talos_version/talosctl-linux-amd64
 sudo install talosctl-linux-amd64 /usr/local/bin/talosctl
 rm talosctl-linux-amd64
-```
+```bash
+
+
+Install qemu-img:
+```bash
+# see https://github.com/qemu/qemu/releases
+# renovate: datasource=github-releases depName=qemu/qemu
+sudo apt-get update
+sudo apt-get install qemu-utils
+```bash
 
 Set your Proxmox details:
 
@@ -72,6 +81,12 @@ export PROXMOX_VE_INSECURE='1'
 export PROXMOX_VE_ENDPOINT="https://$TF_VAR_proxmox_pve_node_address:8006"
 export PROXMOX_VE_USERNAME='root@pam'
 export PROXMOX_VE_PASSWORD='vagrant'
+
+export CLUSTER_CIDR='192.168.1'
+export TF_VAR_cluster_vip="$CLUSTER_CIDR.79" # A name to provide for the Talos cluster
+export TF_VAR_cluster_endpoint="https://$TF_VAR_cluster_vip:6443" # k8s api-server endpoint.
+export TF_VAR_cluster_node_network_gateway="$CLUSTER_CIDR.254" # The IP network gateway of the cluster nodes
+export TF_VAR_cluster_node_network="$CLUSTER_CIDR.0/24" # The IP network prefix of the cluster nodes
 EOF
 source secrets-proxmox.sh
 ```
@@ -125,7 +140,22 @@ cilium hubble ui
 ```
 
 Execute an example workload:
+```bash
+#https://krew.sigs.k8s.io/docs/user-guide/setup/install/
+(
+  set -x; cd "$(mktemp -d)" &&
+  OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+  ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+  KREW="krew-${OS}_${ARCH}" &&
+  curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
+  tar zxvf "${KREW}.tar.gz" &&
+  ./"${KREW}" install krew
+)
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
+
+kubectl krew install linstor
+```
 ```bash
 export KUBECONFIG=$PWD/kubeconfig.yml
 kubectl apply -f example.yml
@@ -140,6 +170,7 @@ curl "$example_url"
 xdg-open "$example_url"
 kubectl delete -f example.yml
 ```
+
 
 Execute the [example hello-etcd stateful application](https://github.com/rgl/hello-etcd):
 
